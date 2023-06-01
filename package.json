@@ -19,6 +19,7 @@
     "express": "^4.16.1",
     "express-session": "~1.17.1",
     "mongodb": "^3.6.1",
+    "morgan": "^1.10.0",
     "passport": "^0.4.1",
     "passport-github": "~1.1.0",
     "passport-local": "~1.0.0",
@@ -39,6 +40,7 @@
   ],
   "license": "MIT",
   "devDependencies": {
-    "nodemon": "^2.0.4"
+    "nodemon": "^2.0.4",
+    "prettier": "2.8.8"
   }
 }

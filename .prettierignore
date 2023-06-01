@@ -1,1 +1,3 @@
-.replit
+# Ignore artifacts:
+build
+coverage
