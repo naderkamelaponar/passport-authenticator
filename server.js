@@ -56,7 +56,7 @@ function ensureAuthenticated(req,res,next){
 app.route("/login").post(passport.authenticate('local',{failureRedirect:"/"}),(res,req)=>{
   res.redirect('/profile')
 });
-app.route('/logout',(req,res)=>{
+app.route('/logout').get((req,res)=>{
   req.logout();
   res.redirect('/');
 })
