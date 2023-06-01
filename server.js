@@ -26,6 +26,7 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+
 myDB(async client =>{
 
 const passLocal= new LocalStrategy((username,password,done)=>{
@@ -38,7 +39,7 @@ const passLocal= new LocalStrategy((username,password,done)=>{
   })
 })
 passport.use(passLocal);
-    const myDataBase = await client.db('database').collection('users');
+const myDataBase = await client.db('database').collection('users');
 passport.serializeUser((user,done)=>{
   done(null,user._id);
 });
@@ -47,12 +48,17 @@ passport.deserializeUser((id,done)=>{
     done(null, doc);
   }); 
 })
-
+function ensureAuthenticated(req,res,next){
+  if (req.isAuthenticated()){return next()}
+  res.redirect("/");
+}
 
 app.route("/login").post(passport.authenticate('local',{failureRedirect:"/"}),(res,req)=>{
-  res.render('profile')
+  res.redirect('/profile')
 });
-
+app.route("/profile").get(ensureAuthenticated,(req,res)=>{
+  res.render("profile")
+})
 });
 app.route('/').get((req, res) => {
   res.render('index', { title: 'Connected to Database', message: 'Please log in' ,showLogin:true});
