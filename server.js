@@ -18,6 +18,16 @@ const { ObjectID } = require('mongodb');
 const session =require('express-session');
 
 /** change below here */
+app.use(session({
+  secret:process.env.SESSION_SECRET,
+  resave:true,
+  saveUninitialized:true,
+  cookie:{secure:false}
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+myDB(async client =>{
+
 const passLocal= new LocalStrategy((username,password,done)=>{
   myDataBase.findOne({username:username},(err,user)=>{
     console.log(`User ${username} attempted to log in.`)
@@ -28,15 +38,6 @@ const passLocal= new LocalStrategy((username,password,done)=>{
   })
 })
 passport.use(passLocal);
-app.use(session({
-  secret:process.env.SESSION_SECRET,
-  resave:true,
-  saveUninitialized:true,
-  cookie:{secure:false}
-}));
-app.use(passport.initialize());
-app.use(passport.session());
-myDB(async client =>{
     const myDataBase = await client.db('database').collection('users');
 passport.serializeUser((user,done)=>{
   done(null,user._id);
@@ -46,12 +47,18 @@ passport.deserializeUser((id,done)=>{
     done(null, doc);
   }); 
 })
-})
 
-app.route('/').get((req, res) => {
-  res.render('index', { title: 'Connected to Database', message: 'Please log in' });
+
+app.route("/login").post(passport.authenticate('local',{failureRedirect:"/"}),(res,req)=>{
+  res.render('profile')
+});
 
 });
+app.route('/').get((req, res) => {
+  res.render('index', { title: 'Connected to Database', message: 'Please log in' ,showLogin:true});
+
+});
+
 /** change above here */
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
