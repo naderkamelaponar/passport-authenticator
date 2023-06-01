@@ -37,7 +37,7 @@ myDB(async (client) => {
       console.log(`User ${username} attempted to log in.`);
       if (err) return done(err);
       if (!user) return done(null, false);
-      if (!bcrybt.compareSync(password,user.password)) return done(null, false);
+      if (!bcrybt.compareSync(password,user.password)) {return done(null, false)};
       return done(null, user);
     });
   });
