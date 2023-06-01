@@ -18,7 +18,7 @@ const { ObjectID } = require("mongodb");
 const session = require("express-session");
 var morgan = require("morgan");
 app.use(morgan("combined"));
-const bcrybt=require("bcrypt");
+const bcrybt = require("bcrypt");
 /** change below here */
 app.use(
   session({
@@ -37,17 +37,19 @@ myDB(async (client) => {
       console.log(`User ${username} attempted to log in.`);
       if (err) return done(err);
       if (!user) return done(null, false);
-      if (!bcrybt.compareSync(password,user.password)) {return done(null, false)};
+      if (!bcrybt.compareSync(password, user.password)) {
+        return done(null, false);
+      }
       return done(null, user);
     });
   });
-  passport.use(passLocal);
+
   app.route("/").get((req, res) => {
     res.render("index", {
       title: "Connected to Database",
       message: "Please log in",
       showLogin: true,
-      showRegistration:true,
+      showRegistration: true,
     });
   });
   const myDataBase = await client.db("database").collection("users");
@@ -60,16 +62,14 @@ myDB(async (client) => {
     });
   });
 
-  app
-    .route("/login")
-    .post(
-      /**middleware */
-      passport.authenticate("local", { failureRedirect: "/" }),
-      /** when pass */
-      (req, res) => {
-        res.redirect("/profile");
-      }
-    );
+  app.route("/login").post(
+    /**middleware */
+    passport.authenticate("local", { failureRedirect: "/" }),
+    /** when pass */
+    (req, res) => {
+      res.redirect("/profile");
+    }
+  );
   app.route("/logout").get((req, res) => {
     req.logout();
     res.redirect("/");
@@ -77,28 +77,35 @@ myDB(async (client) => {
   app.route("/profile").get(ensureAuthenticated, (req, res) => {
     res.render("profile", { username: req.user.username });
   });
-  app.route("/register").post((req,res,next)=>{
-    myDataBase.findOne({username:req.body.username},(err,user)=>{
-      const hash=bcrybt.hashSync(req.body.password,12);
-      if(err){next(err)}
-      else if (user){res.redirect("/")}
-      else{
+  app.route("/register").post((req, res, next) => {
+    myDataBase.findOne({ username: req.body.username }, (err, user) => {
+      const hash = bcrybt.hashSync(req.body.password, 12);
+      if (err) {
+        next(err);
+      } else if (user) {
+        res.redirect("/");
+      } else {
         /** insert new */
-        myDataBase.insertOne({
-          username:req.body.username,
-          password:hash
-        },(err,doc)=>{
-          if(err){res.redirect("/")}
-          else{next(null,doc.ops[0])}
-        })
+        myDataBase.insertOne(
+          {
+            username: req.body.username,
+            password: hash,
+          },
+          (err, doc) => {
+            if (err) {
+              res.redirect("/");
+            } else {
+              next(null, doc.ops[0]);
+            }
+          }
+        );
       }
-    })
-  })
-
+    });
+  });
+  passport.use(passLocal);
   app.use((req, res, next) => {
     res.status(404).type("text").send("Not Found");
   });
-
 });
 function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {
