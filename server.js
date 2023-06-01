@@ -79,11 +79,11 @@ myDB(async (client) => {
   });
   app.route("/register").post((req,res,next)=>{
     myDataBase.findOne({username:req.body.username},(err,user)=>{
+      const hash=bcrybt.hashSync(req.body.password,12);
       if(err){next(err)}
       else if (user){res.redirect("/")}
       else{
         /** insert new */
-        const hash=bcrybt.hashSync(req.body.password,12);
         myDataBase.insertOne({
           username:req.body.username,
           password:hash
