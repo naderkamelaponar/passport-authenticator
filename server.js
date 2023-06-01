@@ -57,8 +57,8 @@ app.route("/login").post(passport.authenticate('local',{failureRedirect:"/"}),(r
   res.redirect('/profile')
 });
 app.route('/logout',(req,res)=>{
-  req.logout()
-  res.redirect("/");
+  req.logout();
+  res.redirect('/');
 })
 app.route("/profile").get(ensureAuthenticated,(req,res)=>{
   res.render("profile",{username:req.user.username})
