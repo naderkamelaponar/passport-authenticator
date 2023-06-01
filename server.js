@@ -18,7 +18,7 @@ const { ObjectID } = require("mongodb");
 const session = require("express-session");
 var morgan = require("morgan");
 app.use(morgan("combined"));
-const bcrybt = require("bcrypt");
+const bcrypt = require("bcrypt");
 /** change below here */
 app.use(
   session({
@@ -37,7 +37,7 @@ myDB(async (client) => {
       console.log(`User ${username} attempted to log in.`);
       if (err) return done(err);
       if (!user) return done(null, false);
-      if (!bcrybt.compareSync(password, user.password)) {
+      if (!bcrypt.compareSync(password, user.password)) {
         return done(null, false);
       }
       return done(null, user);
@@ -80,7 +80,7 @@ myDB(async (client) => {
   app.route("/register").post(
     (req, res, next) => {
       myDataBase.findOne({ username: req.body.username }, (err, user) => {
-        const hash = bcrybt.hashSync(req.body.password, 12);
+        const hash = bcrypt.hashSync(req.body.password, 12);
         if (err) {
           next(err);
         } else if (user) {
