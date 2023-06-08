@@ -8,6 +8,7 @@ module.exports = function (app, myDataBase) {
           message: "Please log in",
           showLogin: true,
           showRegistration: true,
+          showSocialAuth: true
         });
       });
       app.route("/login").post(
