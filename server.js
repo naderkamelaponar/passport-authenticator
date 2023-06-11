@@ -13,14 +13,11 @@ app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "pug");
 app.set("views", "./views/pug");
 const passport = require("passport");
-const LocalStrategy = require("passport-local");
-
 const session = require("express-session");
 var morgan = require("morgan");
 app.use(morgan("combined"));
-const bcrypt = require("bcrypt");
-const routes=require("./routes");
-const auth=require("./auth");
+const routes = require("./routes");
+const auth = require("./auth");
 /** change below here */
 app.use(
   session({
@@ -30,22 +27,23 @@ app.use(
     cookie: { secure: false },
   })
 );
-app.use(passport.initialize());
-app.use(passport.session());
+
 
 myDB(async (client) => {
-  
   const myDataBase = await client.db("database").collection("users");
-  routes(app,myDataBase);
+  app.use(passport.initialize());
+app.use(passport.session());
+  routes(app, myDataBase);
   auth(app,myDataBase);
-  
-
-  
+}).catch(e => {
+  app.route('/').get((req, res) => {
+    res.render('index', { title: e, message: 'Unable to connect to database' });
+  });
 });
-
 
 /** change above here */
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+app.listen(PORT, (a,b) => {
+  console.log(process.env.HOST)
   console.log("Go to http://localhost:" + PORT);
 });
