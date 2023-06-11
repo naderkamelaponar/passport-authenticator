@@ -59,6 +59,18 @@ module.exports = function (app, myDataBase) {
       res.redirect("/profile");
     }
   );
+  app.route("/auth/github").post(passport.authenticate("github"))
+  app.route("/auth/github/callback").post(
+    /**middleware */
+    passport.authenticate("github", { failureRedirect: "/" }),
+    /** when pass */
+    (req, res) => {
+      console.log(req)
+      res.redirect("/profile");
+      //res.json({user:req.user});
+    }
+  );
+
   app.use((req, res, next) => {
     res.status(404).type("text").send("Not Found");
   });
