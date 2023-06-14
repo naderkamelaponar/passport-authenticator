@@ -5,6 +5,8 @@ const express = require("express");
 const myDB = require("./connection");
 const fccTesting = require("./freeCodeCamp/fcctesting.js");
 const app = express();
+const http = require('http').createServer(app);
+const io = require('socket.io')(http);
 fccTesting(app); //For FCC testing purposes
 app.use("/public", express.static(process.cwd() + "/public"));
 app.use(express.json());
@@ -31,6 +33,9 @@ app.use(
 
 myDB(async (client) => {
   const myDataBase = await client.db("database").collection("users");
+  io.on("connection",socket=>{
+    console.log('A user has connected',socket);
+  })
   app.use(passport.initialize());
 app.use(passport.session());
   routes(app, myDataBase);
@@ -44,6 +49,6 @@ app.use(passport.session());
 /** change above here */
 const PORT = process.env.PORT || 3000;
 const URL = process.env.APP_URL || "http://localhost:" + PORT
-app.listen(PORT, () => {
+http.listen(PORT, () => {
   console.log("App is live @ " +  URL );
 });

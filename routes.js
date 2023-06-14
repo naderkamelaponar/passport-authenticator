@@ -10,6 +10,10 @@ module.exports = function (app, myDataBase) {
       showSocialAuth: true,
     });
   });
+  app.route("/chat").get(ensureAuthenticated,(req,res)=>{
+    res.render("chat.pug",{ user: req.user })
+
+  })
   app.route("/login").post(
     /**middleware */
     passport.authenticate("local", { failureRedirect: "/" }),
@@ -66,8 +70,8 @@ module.exports = function (app, myDataBase) {
     passport.authenticate("github", { failureRedirect: "/" }),
     /** when pass */
     (req, res) => {
-      console.log(req)
-      res.redirect("/profile");
+      req.session.user_id = req.user.id
+      res.redirect("/chat");
       //res.json({user:req.user});
     }
   );
