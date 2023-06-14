@@ -1,6 +1,9 @@
-require("dotenv").config();
-/*global io*/
-let socket = io(process.env.APP_URL);
+/*global io*/   
+let socket = io();
+socket.on('user count',function(data){
+  console.log(data);
+})
+
 $(document).ready(function () {
   // Form submittion with new message in field with id 'm'
   $("form").submit(function () {
