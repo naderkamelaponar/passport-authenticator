@@ -2,6 +2,7 @@ const { ObjectID } = require("mongodb");
 const passport = require("passport");
 const bcrypt = require("bcrypt");
 const LocalStrategy = require("passport-local");
+const GitHubStrategy = require("passport-github")
 module.exports = function (app, myDataBase) {
   passport.serializeUser((user, done) => {
     done(null, user._id);
@@ -11,7 +12,7 @@ module.exports = function (app, myDataBase) {
       done(null, doc);
     });
   });
-
+/** LOCAL STRATEGY */
   passport.use(new LocalStrategy((username, password, done) => {
     myDataBase.findOne({ username: username }, (err, user) => {
       console.log(`User ${username} attempted to log in.`);
@@ -23,4 +24,35 @@ module.exports = function (app, myDataBase) {
       return done(null, user);
     });
   }));
+
+/** GITHUB STRATEGY */
+  passport.use(new GitHubStrategy({
+    clientID: process.env.GITHUB_CLIENT_ID,
+    clientSecret: process.env.GITHUB_CLIENT_SECRET,
+    callbackURL: '' /*INSERT CALLBACK URL ENTERED INTO GITHUB HERE*/
+  },
+    function(accessToken, refreshToken, profile, cb) {
+      
+      myDataBase.findAndModify(
+        { id: profile.id },
+        {},
+        {
+          $setOnInsert: {
+            id: profile.id,
+            name: profile.displayName || 'John Doe',
+            photo: profile.photos[0].value || '',
+            email: Array.isArray(profile.emails) ? profile.emails[0].value : 'No public email',
+            created_on: new Date(),
+            provider: profile.provider || ''
+          }, $set: {
+            last_login: new Date()
+          }, $inc: {
+            login_count: 1
+          }
+        },
+        { upsert: true, new: true },
+        (err, doc) => {
+          return cb(null, doc.value);
+        })
+    }))
 };

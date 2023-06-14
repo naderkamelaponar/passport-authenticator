@@ -25,7 +25,8 @@ module.exports = function (app, myDataBase) {
     res.redirect("/");
   });
   app.route("/profile").get(ensureAuthenticated, (req, res) => {
-    res.render("profile", { username: req.user.username });
+    console.log(req)
+    res.render("profile", { username: req.user.name });
   });
   app.route("/register").post(
     (req, res, next) => {
@@ -39,7 +40,7 @@ module.exports = function (app, myDataBase) {
           /** insert new */
           myDataBase.insertOne(
             {
-              username: req.body.username,
+              username: req.body.name,
               password: hash,
             },
             (err, doc) => {

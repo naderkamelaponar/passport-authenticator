@@ -44,6 +44,6 @@ app.use(passport.session());
 /** change above here */
 const PORT = process.env.PORT || 3000;
 const URL = process.env.APP_URL || "http://localhost:" + PORT
-app.listen(PORT, (a,b) => {
+app.listen(PORT, () => {
   console.log("App is live @ " +  URL );
 });
