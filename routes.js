@@ -24,6 +24,10 @@ module.exports = function (app, myDataBase) {
       //res.json({user:req.user});
     }
   );
+  app.route("/logout").get((req, res) => {
+    req.logout();
+    res.redirect("/");
+  });
   app.route("/profile").get(ensureAuthenticated, (req, res) => {
     console.log(req)
     res.render("profile", { username: req.user.name });
@@ -71,10 +75,7 @@ module.exports = function (app, myDataBase) {
       //res.json({user:req.user});
     }
   );
-  app.route("/logout").get((req, res) => {
-    req.logout();
-    res.redirect("/");
-  });
+
   app.use((req, res, next) => {
     res.status(404).type("text").send("Not Found");
   });
